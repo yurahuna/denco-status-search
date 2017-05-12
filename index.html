@@ -11,24 +11,30 @@
         <h1>でんこステータスサーチ</h1>
         <form name="input">
             <select name="denco_name", onChange="dispStatus()">
+                <option selected>---でんこを選んでね---</option>
             </select>
         </form>
-        <div id="table"></div>
+        <div id="status">
+            <div id="table" style="float:left;"></div>
+            <div id="graph">
+                <div id="graph_AP"></div>
+                <div id="graph_HP"></div>
+            </div>
+        </div>
     <script>
         var dencos;
-        // !!非同期実行!!
         $.getJSON("data.json", null, function(data){
             dencos = data;
             const NUM_DENCO = 55;
             // セレクトボックスの初期化
             for (let i = 1; i <= NUM_DENCO; i++) {
                 document.input.denco_name.innerHTML += "<option></option>";
-                document.input.denco_name.options[i - 1].text = i + " " + dencos["" + i]["name"];
+                document.input.denco_name.options[i].text = i + " " + dencos["" + i]["name"];
             }
         });
 
         function dispStatus() {
-            let id = document.input.denco_name.selectedIndex + 1;
+            let id = document.input.denco_name.selectedIndex;
             let denco = dencos["" + id];
 
             // 表を作成
@@ -42,6 +48,10 @@
             }
             table += "</tbody></table>";
             document.getElementById("table").innerHTML = table;
+
+            // グラフを表示
+            document.getElementById("graph_AP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_AP.png\" />";
+            document.getElementById("graph_HP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_HP.png\" />";
         }
     </script>
 </body>
