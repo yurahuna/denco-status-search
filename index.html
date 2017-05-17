@@ -2,9 +2,13 @@
 <html lang="ja">
 <head>
     <meta charset="utf8">
+    <!-- <link rel="stylesheet" href="mystyle.css"> -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>でんこステータスサーチ</title>
-    <link rel="stylesheet" href="mystyle.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </head>
 <body>
     <CENTER>
@@ -14,11 +18,14 @@
                 <option selected>---でんこを選んでね---</option>
             </select>
         </form>
-        <div id="status">
-            <div id="table" style="float:left;"></div>
-            <div id="graph">
-                <div id="graph_AP"></div>
-                <div id="graph_HP"></div>
+    </CENTER>
+        <div id="status" class="container-fluid">
+            <div class="row">
+                <div id="table" class="col-sm-2"></div>
+                <div id="graph" class="col-sm-10">
+                    <div id="graph_AP"></div>
+                    <div id="graph_HP"></div>
+                </div>
             </div>
         </div>
     <script>
@@ -38,7 +45,7 @@
             let denco = dencos["" + id];
 
             // 表を作成
-            let table = "<table border=\"1\"><thead><tr><th>Lv</th><th>AP</th><th>HP</th></tr></thead><tbody>";
+            let table = "<table class=\"table\"><thead><tr><th>Lv</th><th>AP</th><th>HP</th></tr></thead><tbody>";
             for (let i = 1; i < denco["AP"].length; ++i) {
                 table += "<tr>";
                 table += "<td>" + i + "</td>";
@@ -50,8 +57,8 @@
             document.getElementById("table").innerHTML = table;
 
             // グラフを表示
-            document.getElementById("graph_AP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_AP.png\" />";
-            document.getElementById("graph_HP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_HP.png\" />";
+            document.getElementById("graph_AP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_AP.png\" class=\"img-responsive\" />";
+            document.getElementById("graph_HP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_HP.png\" class=\"img-responsive\"/>";
         }
     </script>
 </body>
