@@ -2,13 +2,16 @@
 <html lang="ja">
 <head>
     <meta charset="utf8">
-    <!-- <link rel="stylesheet" href="mystyle.css"> -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>でんこステータスサーチ</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <link href="c3-0.4.11/c3.css" rel="stylesheet" type="text/css">
+    <!-- 2017.05.17 c3-0.4.11 は d3.v4 未対応らしい -->
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="c3-0.4.11/c3.min.js"></script>
 </head>
 <body>
     <CENTER>
@@ -18,47 +21,90 @@
                 <option selected>---でんこを選んでね---</option>
             </select>
         </form>
-    </CENTER>
-        <div id="status" class="container-fluid">
-            <div class="row">
-                <div id="table" class="col-sm-2"></div>
-                <div id="graph" class="col-sm-10">
-                    <div id="graph_AP"></div>
-                    <div id="graph_HP"></div>
-                </div>
+        <div id="status">
+            <div id="graph">
+                <div id="graph_AP"></div>
+                <div id="graph_HP"></div>
             </div>
         </div>
+        <div id="chart"></div>
+
+    </CENTER>
+
     <script>
+        const NUM_DENCO = 55;
+        const MAX_LEVEL = 80;
+        const MAX_Y = 500;
+        const MIN_Y = 0;
+        const STEP_Y = 50;
         var dencos;
         $.getJSON("data.json", null, function(data){
             dencos = data;
-            const NUM_DENCO = 55;
             // セレクトボックスの初期化
-            for (let i = 1; i <= NUM_DENCO; i++) {
+            for (var i = 1; i <= NUM_DENCO; i++) {
                 document.input.denco_name.innerHTML += "<option></option>";
                 document.input.denco_name.options[i].text = i + " " + dencos["" + i]["name"];
             }
         });
 
+        var xTick = ['x'];
+        for (var i = 1; i <= MAX_LEVEL; i++) {
+            xTick.push(i);
+        }
+
         function dispStatus() {
             let id = document.input.denco_name.selectedIndex;
             let denco = dencos["" + id];
 
-            // 表を作成
-            let table = "<table class=\"table\"><thead><tr><th>Lv</th><th>AP</th><th>HP</th></tr></thead><tbody>";
-            for (let i = 1; i < denco["AP"].length; ++i) {
-                table += "<tr>";
-                table += "<td>" + i + "</td>";
-                table += "<td>" + denco["AP"][i] + "</td>";
-                table += "<td>" + denco["HP"][i] + "</td>";
-                table += "</tr>";
-            }
-            table += "</tbody></table>";
-            document.getElementById("table").innerHTML = table;
-
             // グラフを表示
-            document.getElementById("graph_AP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_AP.png\" class=\"img-responsive\" />";
-            document.getElementById("graph_HP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_HP.png\" class=\"img-responsive\"/>";
+            // document.getElementById("graph_AP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_AP.png\" class=\"img-responsive\" />";
+            // document.getElementById("graph_HP").innerHTML = "<img src=\"./fig/" + denco["number"] + "_HP.png\" class=\"img-responsive\"/>";
+
+            var column_AP = denco["AP"];
+            column_AP.shift();
+            column_AP.unshift("AP" + denco["number"]);
+
+            var chart_AP = c3.generate({
+                bindto: '#graph_AP',
+                data: {
+                    x: 'x',
+                    columns: [
+                        xTick,
+                        column_AP
+                    ],
+                    axis: {
+                        y: {
+                            max: MAX_Y,
+                            min: MIN_Y,
+                            padding: {top:0, bottom:0}
+                        }
+                    },
+                    type: 'line'
+                }
+            });
+
+            var column_HP = denco["HP"];
+            column_HP.shift();
+            column_HP.unshift("HP" + denco["number"]);
+
+            var chart_HP = c3.generate({
+                bindto: '#graph_HP',
+                data: {
+                    x: 'x',
+                    columns: [
+                        xTick,
+                        column_HP
+                    ],
+                    axis: {
+                        y: {
+                            max: MAX_Y,
+                            min: MIN_Y,
+                            padding: {top:0, bottom:0}
+                        }
+                    },
+                    type: 'line'
+                }
+            });
         }
     </script>
 </body>
